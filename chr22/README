@@ -1,0 +1,52 @@
+# To run haplotype resolved for chr22  on Pheonix cluster at GaTech
+# do the follwoing
+
+
+# Change this part according to your settings
+############################################
+ssh ntavakoli6@login-phoenix-3.pace.gatech.edu
+qsub -I -q inferno -A GT-saluru8-CODA20 -l nodes=1:ppn=1,mem=300gb,walltime=92:00:00
+
+project_dir=/storage/coda1/p-saluru8/0/ntavakoli6/hg
+software_dir=/storage/coda1/p-saluru8/0/ntavakoli6/software
+DATA=/storage/coda1/p-saluru8/0/ntavakoli6/hg/data
+
+cd ${project_dir}
+bcftools=/storage/coda1/p-saluru8/0/ntavakoli6/software/bcftools/bcftools
+vcftools=/storage/coda1/p-saluru8/0/ntavakoli6/software/vcftools-0.1.16/bin/vcftools
+tabix=/storage/coda1/p-saluru8/0/ntavakoli6/software/tabix/tabix
+
+cd ${DATA}
+
+module load anaconda3 gurobi
+export PYTHONPATH=$GUROBI_HOME/lib/python3.8_utf32:$PYTHONPATH
+
+
+############################################
+
+# ILP solution for haplotype
+
+module load anaconda3 gurobi
+
+export PYTHONPATH=$GUROBI_HOME/lib/python3.8_utf32:$PYTHONPATH
+
+# Example of one run
+/usr/bin/time -v python3 ILP_chr22_anothr_config.py  --hap col4_chr22_haplotypes_frq_all_2.txt --k 2504 --n 1064080 --alpha 5000 --delta 500
+
+# (alpha, delta) = (150,0),(150,2),(150,8), (150,15)
+# (alpha, delta) = (1000, 0), (1000,10), (1000, 50), (1000, 100)
+# (alpha, delta) = (5000, 0), (5000,50), (5000,250), (5000,500)
+# (alpha, delta) = (10000,0), (10000,100), (10000, 500), (10000, 1000)
+
+#  To run with the above configs
+cd pbs
+../ILP_Experiments_Haplotype_Resolved_Phoenix.sh
+
+
+
+
+
+
+
+
+
