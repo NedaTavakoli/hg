@@ -1,16 +1,8 @@
 #!/bin/bash
-# ssh ntavakoli6@login-phoenix-3.pace.gatech.edu
-# qsub -I -q inferno -A GT-saluru8-CODA20 -l nodes=1:ppn=1,mem=300gb,walltime=92:00:00
 
-# Change this part according to your settings
-cd /storage/coda1/p-saluru8/0/ntavakoli6/hg
-VG=/storage/coda1/p-saluru8/0/ntavakoli6/software/vg
-DATA=/storage/coda1/p-saluru8/0/ntavakoli6/hg/data
-REFERENCE=${DATA}/hs37d5.fa
-HAPLOTYPEPATH=/storage/coda1/p-saluru8/0/ntavakoli6/hg/haplotypes
-VGgraph=/storage/coda1/p-saluru8/0/ntavakoli6/hg/vg
+project_dir=$(pwd)  #project top-level directory
+mkdir -p data && cd data
 
-cd data
 
 # Get the reference
 REFERENCE=hs37d5.fa

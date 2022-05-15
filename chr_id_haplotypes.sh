@@ -1,19 +1,7 @@
 #!/bin/bash
-# $1 - chromosome
 
-# Change this part according to your settings
-project_dir=/storage/coda1/p-saluru8/0/ntavakoli6/hg
-software_dir=/storage/coda1/p-saluru8/0/ntavakoli6/software
-DATA=/storage/coda1/p-saluru8/0/ntavakoli6/hg/data
-
-cd ${project_dir}
-bcftools=/storage/coda1/p-saluru8/0/ntavakoli6/software/bcftools/bcftools
-vcftools=/storage/coda1/p-saluru8/0/ntavakoli6/software/vcftools-0.1.16/bin/vcftools
-tabix=/storage/coda1/p-saluru8/0/ntavakoli6/software/tabix/tabix
-
-cd ${DATA}
-
-# https://www.biostars.org/p/298361/
+project_dir=$(pwd)  #project top-level directory
+mkdir -p data && cd data
 
 id=${1}
 
