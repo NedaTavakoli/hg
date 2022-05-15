@@ -1,0 +1,30 @@
+#PBS -N ILP_500_10000
+#PBS -j oe
+#PBS -o ILPlog_500_10000.out
+#PBS -m abe                            
+#PBS -A GT-saluru8-CODA20         # account to which job is charged, ex: GT-gburdell3
+#P#PBSBS -l nodes=1:ppn=1          # number of nodes and cores per node required
+#PBS -l pmem=700gb                # memory per core
+#PBS -l walltime=72:00:00
+
+# change according to the job submission requirement of your cluster
+
+
+project_dir=/storage/coda1/p-saluru8/0/ntavakoli6/hg
+software_dir=/storage/coda1/p-saluru8/0/ntavakoli6/software
+DATA=/storage/coda1/p-saluru8/0/ntavakoli6/hg/data
+
+cd ${project_dir}
+bcftools=/storage/coda1/p-saluru8/0/ntavakoli6/software/bcftools/bcftools
+vcftools=/storage/coda1/p-saluru8/0/ntavakoli6/software/vcftools-0.1.16/bin/vcftools
+tabix=/storage/coda1/p-saluru8/0/ntavakoli6/software/tabix/tabix
+
+cd ${DATA}
+
+module load anaconda3 gurobi
+
+export PYTHONPATH=$GUROBI_HOME/lib/python3.8_utf32:$PYTHONPATH
+
+echo "start running"
+/usr/bin/time -v python3  ILP_chr22_hg.py --hap chr22_haplotypes_frq_all_strings.txt --pos chr22_snp_positions_numbered.txt --alleles chr22_num_allels_per_positions_numbered.txt --samples chr22_sample_dup_numbered.txt -chr 22 --k 5007 --n 1059517 --N 1063618 --alpha 10000 --delta 500
+

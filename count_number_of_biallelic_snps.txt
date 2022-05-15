@@ -1,0 +1,19 @@
+cat chr22.out.frq.count | awk -F"\t" '{if ($3==4) {printf $0"\n"}}' |wc -l
+39
+
+cat chr22.out.frq.count | awk -F"\t" '{if ($3==3) {printf $0"\n"}}' |wc -l
+4025
+
+cat chr22.out.frq.count | awk -F"\t" '{if ($3==2) {printf $0"\n"}}' |wc -l
+1055454
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+cat chr1.out.frq.count | awk -F"\t" '{if ($3==2) {printf $0"\n"}}' |wc -l
+6196151
+
+cat chr1.out.frq.count | awk -F"\t" '{if ($3==3) {printf $0"\n"}}' |wc -l
+1876
+
+cat chr1.out.frq.count | awk -F"\t" '{if ($3==4) {printf $0"\n"}}' |wc -l
+127

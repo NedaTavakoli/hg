@@ -1,31 +1,20 @@
-# To run haplotype resolved for chr22  on Pheonix cluster at GaTech
-# do the follwoing
 
-
-# Change this part according to your settings
-############################################
-ssh ntavakoli6@login-phoenix-3.pace.gatech.edu
-qsub -I -q inferno -A GT-saluru8-CODA20 -l nodes=1:ppn=1,mem=300gb,walltime=92:00:00
-
-project_dir=/storage/coda1/p-saluru8/0/ntavakoli6/hg
-software_dir=/storage/coda1/p-saluru8/0/ntavakoli6/software
-DATA=/storage/coda1/p-saluru8/0/ntavakoli6/hg/data
-
-cd ${project_dir}
-bcftools=/storage/coda1/p-saluru8/0/ntavakoli6/software/bcftools/bcftools
-vcftools=/storage/coda1/p-saluru8/0/ntavakoli6/software/vcftools-0.1.16/bin/vcftools
-tabix=/storage/coda1/p-saluru8/0/ntavakoli6/software/tabix/tabix
-
-cd ${DATA}
-
-module load anaconda3 gurobi
-export PYTHONPATH=$GUROBI_HOME/lib/python3.8_utf32:$PYTHONPATH
+mainwd=$(pwd)  #project top-level directory
+mkdir -p software && cd data
+data=$(pwd)
 
 ############################################
 
 # Download all the vcf files for all human chromosomes
 chmod +x 1_vcf_download_data.sh
-./1_vcf_download_data.sh
+./vcf_download_data.sh
+
+####################################
+
+# Download all the required software dependecies
+mkdir -p software && cd software
+software=$(pwd)
+
 
 ####################################
 
@@ -42,19 +31,44 @@ done
 
 ######################################
 
-# ILP solution for haplotype
+# get vcftools 
+echo "downloading vcftools"
+wget https://github.com/vcftools/vcftools/releases/download/v0.1.16/vcftools-0.1.16.tar.gz
+tar xzf vcftools-0.1.16.tar.gz && cd vcftools-0.1.16
+./autogen.sh
+./configure --prefix=$(pwd)
+make -j -s && make install
+vcftools=$(pwd)
+rm -f "vcftools-0.1.16.tar.gz"
+echo "vcftools download and compilation finished"
 
-module load anaconda3 gurobi
+# get bcftools
+#Note that bcftools will be installed in the bin directory of bcftools folder
+cd $softwarewd
+git clone https://github.com/samtools/bcftools.git
+cd bcftools
+autoreconf -i  # Build the configure script and install files it uses
+./configure  --prefix=$softwarewd/bcftools  # Optional but recommended, for choosing extra functionality
+make
+make install 
+bcftools=$(pwd)
+echo "bcftools download and compilation finished"
 
-export PYTHONPATH=$GUROBI_HOME/lib/python3.8_utf32:$PYTHONPATH
 
-# (alpha, delta) = (150,0),(150,2),(150,8), (150,15)
-# (alpha, delta) = (1000, 0), (1000,10), (1000, 50), (1000, 100)
-# (alpha, delta) = (5000, 0), (5000,50), (5000,250), (5000,500)
-# (alpha, delta) = (10000,0), (10000,100), (10000, 500), (10000, 1000)
+#get Gurobi
+echo "downloading gurobi"
+cd $softwarewd
+wget  https://packages.gurobi.com/9.1/gurobi9.1.0_linux64.tar.gz
+tar xzf gurobi9.1.0_linux64.tar.gz
+make -j -C gurobi910/linux64/src/build #re-compile gurobi cpp files using user's c++ compiler
+cp gurobi910/linux64/src/build/libgurobi_c++.a gurobi910/linux64/lib
+gurobi=$(pwd)
+rm -f "gurobi9.1.0_linux64.tar.gz"
+echo "gurobi download and compilation finished"
 
-# Example for a single run 
-/usr/bin/time -v python3 ILP_chr22_hg.py  --hap col4_chr22_haplotypes_frq_all_2.txt --k 2504 --n 1064080 --alpha 5000 --delta 500
-
+#check if appropriate files exist
+if [ ! -f gurobi910/linux64/include/gurobi_c++.h ]; then echo "gurobi download failed"; fi
+if [ ! -f gurobi910/linux64/src/build/libgurobi_c++.a ]; then echo "gurobi compilation failed"; fi
+if [ ! -f vcftools-0.1.16/bin/vcftools ]; then echo "vcftools compilation failed"; fi
 
 
